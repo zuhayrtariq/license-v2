@@ -14,7 +14,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: 'http://127.0.0.1:5173',
   })
 );
 
@@ -78,6 +78,52 @@ app.post('/add-record', async (req, res) => {
     contractStart,
     contractEnd,
   });
+  res.json(ContractDco);
+});
+app.post('/update-record', async (req, res) => {
+  let {
+    pnNo,
+    description,
+    vendorName,
+    coffStart,
+    coffEnd,
+    contractStart,
+    contractEnd,
+    sesEnd,
+  } = req.body;
+
+  pnNo = pnNo.trim();
+  description = description.trim();
+  vendorName = vendorName.trim();
+
+  coffStart?.map((x) => {
+    return x.trim();
+  });
+
+  coffEnd?.map((x) => {
+    return x.trim();
+  });
+  sesEnd?.map((x) => {
+    return x.trim();
+  });
+
+  contractStart = contractStart.trim();
+
+  contractEnd = contractEnd.trim();
+
+  const ContractDco = await ContractModel.findOneAndUpdate(
+    { pnNo: pnNo },
+    {
+      section: 'PNI',
+      description,
+      vendorName,
+      coffStart,
+      coffEnd,
+      sesEnd,
+      contractStart,
+      contractEnd,
+    }
+  );
   res.json(ContractDco);
 });
 app.get('/all-contracts', async (req, res) => {

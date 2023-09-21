@@ -77,6 +77,13 @@ const Table = () => {
         .duration(moment(date, 'DD-MM-YYYY').diff(moment(new Date())))
         .asDays()
     );
+    if (!Number.isInteger(diff)) {
+      diff = Math.ceil(
+        moment
+          .duration(moment(date, 'DD-MMM-YYYY').diff(moment(new Date())))
+          .asDays()
+      );
+    }
     if (Number.isInteger(diff)) {
       if (diff < 10 && type == 'contract') {
         return 'bg-red-700 text-white font-bold';
@@ -86,7 +93,44 @@ const Table = () => {
         return 'bg-orange-700 text-white font-bold';
       }
     }
+
     return 'bg-white font-semibold';
+  };
+
+  const formatDate = (date) => {
+    if (!date) {
+      return 'N/A';
+    }
+    let newDate = Number.isInteger(
+      moment(date, 'DD.MM.YYYY').format('DD-MMM-YY')
+    );
+    if (Number.isInteger(newDate)) {
+      return newDate;
+    } else {
+      newDate = Number.isInteger(
+        moment(date, 'DD.MMM.YYYY').format('DD-MMM-YY')
+      );
+      if (Number.isInteger(newDate)) {
+        return newDate;
+      }
+    }
+    return date;
+  };
+  const getDateFromNow = (date) => {
+    if (!date) {
+      return 'N/A';
+    }
+    let diff = moment(date, 'DD-MM-YYYY').fromNow();
+
+    if (diff !== 'Invalid date') {
+      return diff;
+    } else {
+      diff = moment(date, 'DD-MMM-YYYY').fromNow();
+      if (diff !== 'Invalid date') {
+        return diff;
+      }
+    }
+    return date;
   };
   const TABLE_HEAD = [
     'PN No.',
@@ -197,12 +241,8 @@ const Table = () => {
                         <td className='whitespace-nowrap px-2 py-3'>
                           {contract.coffStart.map((x, i) => {
                             return (
-                              <span
-                                key={i}
-                                className={getDateRemaining(x, 'calloff')}>
-                                {moment(x, 'DD.MM.YYYY').format('DD-MMM-YY')}
-                                <span className='mb-1 block'></span>
-                                {moment(x, 'DD.MM.YYYY').format('DD-MMM-YY')}
+                              <span key={i} className='bg-white font-semibold'>
+                                {formatDate(x)}
                                 <span className='mb-1 block'></span>
                               </span>
                             );
@@ -216,9 +256,7 @@ const Table = () => {
                               <span
                                 key={i}
                                 className={getDateRemaining(x, 'calloff')}>
-                                {moment(x, 'DD-MM-YYYY').format('DD-MMM-YY')}
-                                <span className='mb-1 block'></span>
-                                {moment(x, 'DD-MM-YYYY').format('DD-MMM-YY')}
+                                {formatDate(x)}
                                 <span className='mb-1 block'></span>
                               </span>
                             );
@@ -232,43 +270,40 @@ const Table = () => {
                               <span
                                 key={i}
                                 className={getDateRemaining(x, 'ses')}>
-                                {moment(x, 'DD-MM-YYYY').format('DD-MMM-YY')}
-                                <span className='mb-1 block'></span>
-                                {moment(x, 'DD-MM-YYYY').format('DD-MMM-YY')}
+                                {formatDate(x)}
                                 <span className='mb-1 block'></span>
                               </span>
                             );
                           })}
+                          {!contract.sesEnd.length && (
+                            <span className={'bg-white font-semibold'}>
+                              N/A
+                              <span className='mb-1 block'></span>
+                            </span>
+                          )}
                         </td>
                       )}
                       {visibleCols.includes(TABLE_HEAD[6]) && (
                         <td className='whitespace-nowrap px-2 py-3'>
-                          {moment(contract.contractStart, 'DD-MM-YYYY').format(
-                            'DD-MMM-YY'
-                          )}
+                          {formatDate(contract.contractStart)}
                         </td>
                       )}
                       {visibleCols.includes(TABLE_HEAD[7]) && (
                         <td className='whitespace-nowrap px-2 py-3'>
-                          {moment(contract.contractEnd, 'DD-MM-YYYY').format(
-                            'DD-MMM-YY'
-                          )}
+                          {formatDate(contract.contractEnd)}
                         </td>
                       )}
                       {visibleCols.includes(TABLE_HEAD[8]) && (
                         <td>
                           <p className='capitalize'>
-                            {moment(contract.coffEnd, 'DD-MM-YYYY').fromNow()}
+                            {getDateFromNow(contract.coffEnd)}
                           </p>
                         </td>
                       )}
                       {visibleCols.includes(TABLE_HEAD[9]) && (
                         <td>
                           <p className='capitalize'>
-                            {moment(
-                              contract.contractEnd,
-                              'DD-MM-YYYY'
-                            ).fromNow()}
+                            {getDateFromNow(contract.contractEnd)}
                           </p>
                         </td>
                       )}
